@@ -63,10 +63,14 @@ h2{
     border: 2px solid wheat;
     display: inline-block;
 }
+.available-move{
+    background:  rgb(85, 64, 26);
+    border: 2px solid wheat;
+    display: inline-block;
+}
 
 .black-piece{
     background: black;
-  
 }
 
 .available-to-move{
@@ -76,3 +80,10 @@ h2{
 .turn-indicator{
     background: darkgreen;
 }
+
+img{
+    width: 20px;
+    height: 20px;
+    margin-top: 4px;
+}
+
