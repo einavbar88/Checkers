@@ -163,22 +163,9 @@ function hasGameEnded(){
         return true
     }
     if(isTieNotEnoughPieces()){
-        alert('${0} Not enough pieces on board to win')
+        alert('${0} Not enough pieces on board to win', tieMessage)
         return true
     }
-    if(isTieNoCaptureOrRegPieceMove()){
-        alert('${0} 100 moves with no ')
-        return true
-    }
-    if(isTieNotEnoughPieces()){
-        alert('${0} has Won!', isWhiteTurn? 'Player 2': 'Player 1')
-        return true
-    }
-    if(isTieNotEnoughPieces()){
-        alert('${0} has Won!', isWhiteTurn? 'Player 2': 'Player 1')
-        return true
-    }
-    
 }
 function hasGameWon(){
     let pieces = isWhiteTurn? whitePieces:blackPieces
@@ -190,7 +177,7 @@ function hasGameWon(){
     }
     return true
 }
-function isTie()
+function isTie(){}
 
 //html and css manipulation
 function addPieceToBoard(boardLocation, isWhite) {
