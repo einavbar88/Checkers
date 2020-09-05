@@ -7,7 +7,7 @@ body{
     background: url("bg.jpeg");
     background-size: 100%;
 }
-h1{
+.headline{
     margin-top: 0;
     font-size: 5rem;
     background: green;
@@ -24,7 +24,7 @@ h2{
 }
 
 .flex-container{
-    margin-top: 5vh;
+    margin-top: 3vh;
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -84,6 +84,22 @@ h2{
 img{
     width: 20px;
     height: 20px;
-    margin-top: 4px;
+    margin-top: 3px;
 }
 
+.btn{
+    padding: 0;
+    margin-top: 40px;
+    margin-bottom: 0;
+    width: 120px;
+    height: 40px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border: none;
+    background: transparent;
+    color: white;
+}
+.hover{
+    width: 200px;
+    font-size: 2rem;
+}

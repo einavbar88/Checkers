@@ -3,6 +3,34 @@ let blackPieces = []
 let hundredTurnsNoCaptureOrRegPieceMovementTie = 0
 let sameBoardRepeated3TimesTie = []
 const turnIndicator = document.getElementsByClassName('turn-indicator-text')
+let didTurnOccur = false
+let isWhiteTurn = true
+let mustCapture = true
+
+/////buttons//////
+////new game
+const newGameBtn = document.getElementById('new-game-btn')
+newGameBtn.addEventListener('click', () => {
+    window.location.href = './Checkers.html';
+})
+newGameBtn.addEventListener('mouseenter', () => {
+    newGameBtn.classList.add('hover');
+})
+newGameBtn.addEventListener('mouseleave', () => {
+    newGameBtn.classList.remove('hover');
+})
+////instructions
+const instructionsBtn = document.getElementById('instructions-btn')
+instructionsBtn.addEventListener('click', () => {
+    alert()
+})
+instructionsBtn.addEventListener('mouseenter', () => {
+    instructionsBtn.classList.add('hover');
+})
+instructionsBtn.addEventListener('mouseleave', () => {
+    instructionsBtn.classList.remove('hover');
+})
+
 //game board cells(that are playable)
 class Cell {
     constructor(boardLocation) {
@@ -10,7 +38,6 @@ class Cell {
         this.htmlRef = document.getElementById(boardLocation)
         this.isEmpty = true
     }
-
 }
 let cells = {
     '00': new Cell('00'), '02': new Cell('02'), '04': new Cell('04'), '06': new Cell('06'), '11': new Cell('11'), '13': new Cell('13'),
@@ -22,9 +49,6 @@ let cells = {
     keys: ['00', '02', '04', '06', '11', '13', '15', '17', '20', '22', '24', '26', '31', '33', '35', '37', '40',
         '42', '44', '46', '51', '53', '55', '57', '60', '62', '64', '66', '71', '73', '75', '77']
 }
-let didTurnOccur = false
-let isWhiteTurn = true
-let mustCapture = true
 //////
 class CheckersPiece {
     constructor(isWhite) {
@@ -32,8 +56,6 @@ class CheckersPiece {
         this.boardLocation
         this.isKing = false
     }
-    setBoardLocation(newLocation) { this.boardLocation = newLocation }
-    getBoardLocation() { return this.boardLocation }
     horizontalDirectionSet(fromX, targetX) {
         if (this.isKing)
             return (targetX > fromX) ? 1 : -1
@@ -43,11 +65,13 @@ class CheckersPiece {
         let fromX = Number(this.boardLocation[0]), targetX = Number(target[0]), fromY = Number(this.boardLocation[1]), targetY = Number(target[1])
         let horizontalDirection = this.horizontalDirectionSet(fromX, targetX)
         let verticalDirection = (targetY > fromY) ? 1 : -1
+        let horizontal = horizontalDirection * targetX - horizontalDirection * fromX
+        let vertical = verticalDirection * targetY - verticalDirection * fromY
         //regular move
-        if (horizontalDirection * targetX - horizontalDirection * fromX === 1 && verticalDirection * targetY - verticalDirection * fromY === 1)
+        if (horizontal === 1 && vertical === 1)
             return isCellEmpty(target)
         //capture
-        else if (horizontalDirection * targetX - horizontalDirection * fromX === 2 && verticalDirection * targetY - verticalDirection * fromY === 2
+        else if (horizontal === 2 && vertical === 2
             && cells[target].isEmpty) {
             let inBetweenCell = (targetX + fromX) / 2 + '' + (targetY + fromY) / 2
             return findPiece(inBetweenCell, !this.isWhite) !== null
@@ -66,30 +90,35 @@ function initializePieces() {
     let blackCounter = 0
     for (let key of cells.keys)
         if (key[0] < 3) {
-            whitePieces[whiteCounter].setBoardLocation(key)
+            whitePieces[whiteCounter].boardLocation = key
             addPieceToBoard(key, true)
             whiteCounter++
         }
         else if (key[0] > 4) {
-            blackPieces[blackCounter].setBoardLocation(key)
+            blackPieces[blackCounter].boardLocation = key
             addPieceToBoard(key, false)
             blackCounter++
         }
 
 }
-function game() {
+function gameStart() {
     initializePieces()
     addEventListenersForPieces()
     newTurn()
 }
 function newTurn() {
+    if(hasGameEnded())
+    {
+        return
+    }
     mustCapture = isMustCapture()
     didTurnOccur = false
-    turnIndicatorlight(isWhiteTurn)
+    turnIndicatorlightAndAvailableToMoveIndicator()
     while (didTurnOccur) {
         return newTurn()
     }
 }
+
 //logic functions
 function isValidMove(boardLocation, target, isWhiteTurn) {
     let piece = findPiece(boardLocation, isWhiteTurn)
@@ -97,11 +126,10 @@ function isValidMove(boardLocation, target, isWhiteTurn) {
         return false
     return piece.isValidMove(target)
 }
-function isMustCapture(){
-    mustCapture = true
-    let pieces = isWhiteTurn ? whitePieces: blackPieces
+function isMustCapture() {
+    let pieces = isWhiteTurn ? whitePieces : blackPieces
     for (let piece of pieces) {
-        if(checkForValidMoves(piece.boardLocation, isWhiteTurn).length !== 0)
+        if (checkForValidMoves(piece.boardLocation, isWhiteTurn).length !== 0)
             return true
     }
     return false
@@ -128,6 +156,42 @@ function isPromotion(boardLocation, isWhite) {
     let promotionRow = isWhite ? 7 : 0
     return boardLocation[0] === '' + promotionRow
 }
+function hasGameEnded(){
+    let tieMessage = 'Game ended in a tie!'
+    if(hasGameWon()){
+        alert('${0} has Won!', isWhiteTurn? 'Player 2': 'Player 1')
+        return true
+    }
+    if(isTieNotEnoughPieces()){
+        alert('${0} Not enough pieces on board to win')
+        return true
+    }
+    if(isTieNoCaptureOrRegPieceMove()){
+        alert('${0} 100 moves with no ')
+        return true
+    }
+    if(isTieNotEnoughPieces()){
+        alert('${0} has Won!', isWhiteTurn? 'Player 2': 'Player 1')
+        return true
+    }
+    if(isTieNotEnoughPieces()){
+        alert('${0} has Won!', isWhiteTurn? 'Player 2': 'Player 1')
+        return true
+    }
+    
+}
+function hasGameWon(){
+    let pieces = isWhiteTurn? whitePieces:blackPieces
+    if(pieces.length === 0)
+        return true
+    for (const piece of pieces) {
+        if(isMovable(piece.boardLocation, isWhiteTurn))
+            return false
+    }
+    return true
+}
+function isTie()
+
 //html and css manipulation
 function addPieceToBoard(boardLocation, isWhite) {
     let visualPiece = document.createElement("div")
@@ -168,12 +232,27 @@ function executeMove(from, target, isWhite, captured = null) {
         removeCapturedPieceFromPieceArray(captured, !isWhite)
         removePieceFromBoard(captured)
     }
-    findPiece(from, isWhite).setBoardLocation(target)
+    findPiece(from, isWhite).boardLocation = target
     movePiece(from, target)
+    mustCapture = true
+    if (isCaptureMove(from, target) && checkForValidMoves(target, isWhite).length !== 0) {
+        cells[target].htmlRef.addEventListener('dblclick', chainCaptureCancel)
+        cells[target].htmlRef.target = target
+        showAvailableMoves(target)
+        endTurn()
+        newTurn()
+    }
     if (isPromotion(target, isWhite))
         promotion(target, isWhite)
     endTurn()
     newTurn()
+
+}
+function chainCaptureCancel(event) {
+    removeAvailableMoves()
+    endTurn()
+    newTurn()
+    cells[Number(event.currentTarget.target)].htmlRef.removeEventListener('dblclick', chainCaptureCancel)
 }
 function removeCapturedPieceFromPieceArray(captured, isWhite) {
     let capturedPiece = findPiece(captured, isWhite)
@@ -186,10 +265,16 @@ function removeCapturedPieceFromPieceArray(captured, isWhite) {
         }
     }
 }
-function turnIndicatorlight(isWhiteTurn) {
+function turnIndicatorlightAndAvailableToMoveIndicator() {
     let turn = isWhiteTurn ? 1 : 0
     turnIndicator[turn].classList.add('turn-indicator')
     turnIndicator[Math.abs(turn - 1)].classList.remove('turn-indicator')
+    let pieces = isWhiteTurn ? whitePieces : blackPieces
+    for (let piece of pieces) {
+        let boardLocation = piece.boardLocation
+        if (checkForValidMoves(boardLocation, isWhiteTurn).length !== 0)
+            cells[boardLocation].htmlRef.childNodes[0].classList.add('available-to-move')
+    }
 }
 function addEventListenersForPieces() {
     let whitePiecesInHtml = document.getElementsByClassName('white-piece')
@@ -234,6 +319,7 @@ function removeAvailableMoves() {
             cells[cellLocation].htmlRef.removeChild(cell.htmlRef.children[0])
     }
 }
+
 //auxilary functions
 function findPiece(boardLocation, isWhite) {
     let pieces = isWhite ? whitePieces : blackPieces
@@ -247,9 +333,16 @@ function isCellEmpty(boardLocation) {
     return cells[boardLocation].isEmpty
 }
 function endTurn() {
+    let pieces = isWhiteTurn ? whitePieces : blackPieces
+    for (let piece of pieces) {
+        cells[piece.boardLocation].htmlRef.childNodes[0].classList.remove('available-to-move')
+    }
     didTurnOccur = true
     isWhiteTurn = !isWhiteTurn
 }
 function applyMustCapture() {
     mustCapture = true
 }
+
+////////start the game////////
+gameStart()

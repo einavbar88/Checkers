@@ -1,0 +1,17 @@
+ Checkers is a classic board game, dating back to around 3000 BC. It is very simple, but a lot of fun! Checkers is known as Draughts in England and there are multiple variations of it all around the world. The game is played on an 8x8 chequered board, essentially a chess board. Each player starts with 12 pieces, placed on the dark squares of the board closest to them. The objective of the game is to capture all the opponent's pieces by jumping over them.
+Gameplay
+
+Pieces can only move diagonally on the dark squares, the light squares of the board are never used. A normal move is moving a piece diagonally forward one square. The initial pieces can only move forward diagonally, not backwards. You cannot move onto a square that is occupied by another piece. However, if an opponent piece is on the square diagonally in front of you and the square behind it is empty then you can (and must!) jump over it diagonally, thereby capturing it. If you land on a square where you can capture another opponent piece you must jump over that piece as well, immediately. One turn can capture many pieces. It is required to jump over pieces whenever you can.
+
+If a piece reaches the end row of the board, on the opponent's side, it becomes a King. Kings can move diagonally forwards and backwards, making them more powerful in jumping over opponent pieces. However, if you jump over a piece to become a King you can not jump backwards over another piece in the same move, you have to wait until the next turn to start moving backwards.
+
+Jumping over opponents is required. However, if you have two possible moves, where one jumps over one opponent and the other jumps over two or more opponents you are not required to take the jump with the most opponents captured, you are just required to take any jump move.
+Winning
+
+The game can end in four different ways:
+
+    If a player has lost all his pieces he loses.
+    If a player can't move at all, all his pieces are blocked, he loses.
+    The exact same board state has come up three times without any men captured in between. The game ends in a draw. This is to avoid situation with two pieces left just moving around never being able to capture each other.
+    There have been 100 moves (50 for each player) with no piece captured. The game ends in a draw.
+
