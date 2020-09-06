@@ -14,6 +14,11 @@ body{
     border: 5px solid black;
     color: blanchedalmond;    
 }
+h1{
+    font-size: 2rem;
+    margin: 0;
+    text-decoration-line: underline;
+}
 h2{
     font-size: 1.5rem;
     border: 2px solid white;
@@ -24,13 +29,11 @@ h2{
 }
 
 .flex-container{
-    margin-top: 3vh;
     display: flex;
     align-items: center;
     flex-direction: row;
     justify-content: center;
     flex-wrap: wrap;
-    
 }
 
 .flex-container-board{
@@ -103,3 +106,81 @@ img{
     width: 200px;
     font-size: 2rem;
 }
+.instructions-container{
+    display: block;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 80px;
+    background: black;
+    border-radius: 1%;
+    opacity: 40%;
+}
+#instructions{
+    font-Size: 1.75rem;
+    font-weight: 700;
+    color: white;
+    opacity: 100%;
+}
+@media only screen and (min-width: 600px) {
+    .btn{
+        width: 150px;
+        height: 50px;
+        font-size: 2rem; 
+        margin: 20px;
+    }
+    .hover{
+        width: 300px;
+        font-size: 3rem;
+    }
+    img{
+        width: 50px;
+        height: 50px;
+        margin-top: 3px;
+    }
+    .circle {
+        margin: 4px;
+        height: 60px;
+        width: 60px;
+        background: darkred;
+        border-radius: 50%;
+        border: 2px solid wheat;
+        display: inline-block;
+    }
+    .flex-squares{
+        width: 70px;
+        height: 70px;
+    }
+    .available-move{
+        background:  rgb(85, 64, 26);
+        border: 2px solid wheat;
+        display: inline-block;
+    }
+    
+    .black-piece{
+        background: black;
+    }
+    
+    .available-to-move{
+        border: 4px solid lightblue;
+    }
+    
+    .turn-indicator{
+        background: darkgreen;
+    }
+    .instructions-container{
+        display: block;
+        margin-left: 120px;
+        margin-right: 120px;
+        background: black;
+        border-radius: 10%;
+        opacity: 50%;
+    }
+    #instructions{
+        font-Size: 1.75rem;
+        color: white;
+    }
+    h1{
+        margin: 0;
+        text-decoration-line: underline;
+    }
+    }

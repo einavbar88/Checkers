@@ -23,7 +23,7 @@ newGameBtn.addEventListener('mouseleave', () => {
 ////instructions
 const instructionsBtn = document.getElementById('instructions-btn')
 instructionsBtn.addEventListener('click', () => {
-    alert()
+    document.getElementById('instructions').scrollIntoView(); 
 })
 instructionsBtn.addEventListener('mouseenter', () => {
     instructionsBtn.classList.add('hover');
