@@ -1,15 +1,16 @@
 *{
     box-sizing: border-box;
-    font-family: 'Great Vibes', cursive;
+    font-family: 'Long Cang', cursive;
     text-align: center;
 }
+
 body{
     background: url("bg.jpeg");
     background-size: 100%;
 }
 .headline{
     margin-top: 0;
-    font-size: 5rem;
+    font-size: 4rem;
     background: green;
     border: 5px solid black;
     color: blanchedalmond;    
@@ -21,6 +22,7 @@ h1{
 }
 h2{
     font-size: 1.5rem;
+    font-family: cursive;
     border: 2px solid white;
     color: white;
 }
@@ -110,7 +112,7 @@ img{
     display: block;
     margin-left: 20px;
     margin-right: 20px;
-    margin-top: 80px;
+    margin-top: 40px;
     background: black;
     border-radius: 1%;
     opacity: 40%;
