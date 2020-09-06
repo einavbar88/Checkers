@@ -1,11 +1,12 @@
 let whitePieces = []
 let blackPieces = []
-let hundredTurnsNoCaptureOrRegPieceMovementTie = 0
-let sameBoardRepeated3TimesTie = []
+let NoCaptureOrRegPieceMovementCounter = 0
+let savedBoardsAsStrings = []
 const turnIndicator = document.getElementsByClassName('turn-indicator-text')
 let didTurnOccur = false
 let isWhiteTurn = true
 let mustCapture = true
+let isGameActive = true
 
 /////buttons//////
 ////new game
@@ -80,7 +81,7 @@ class CheckersPiece {
             return false
     }
 }
-//initialization
+//initialization and turn start
 function initializePieces() {
     for (let i = 0; i < 12; i++) {
         whitePieces.push(new CheckersPiece(true))
@@ -107,18 +108,17 @@ function gameStart() {
     newTurn()
 }
 function newTurn() {
-    if(hasGameEnded())
-    {
-        return
-    }
     mustCapture = isMustCapture()
     didTurnOccur = false
-    turnIndicatorlightAndAvailableToMoveIndicator()
-    while (didTurnOccur) {
+    if (hasGameEnded())
+        isGameActive = false
+    else
+        turnIndicatorlightAndAvailableToMoveIndicator()
+    saveBoardState()
+    NoCaptureOrRegPieceMovementCounter++
+    while (didTurnOccur && isGameActive)
         return newTurn()
-    }
 }
-
 //logic functions
 function isValidMove(boardLocation, target, isWhiteTurn) {
     let piece = findPiece(boardLocation, isWhiteTurn)
@@ -156,29 +156,71 @@ function isPromotion(boardLocation, isWhite) {
     let promotionRow = isWhite ? 7 : 0
     return boardLocation[0] === '' + promotionRow
 }
-function hasGameEnded(){
+function hasGameEnded() {
     let tieMessage = 'Game ended in a tie!'
-    if(hasGameWon()){
-        alert('${0} has Won!', isWhiteTurn? 'Player 2': 'Player 1')
+    if (hasGameWon()) {
+        let winner = isWhiteTurn ? "Player 2" : "Player 1"
+        alert(winner + ' has Won!')
         return true
     }
-    if(isTieNotEnoughPieces()){
-        alert('${0} Not enough pieces on board to win', tieMessage)
+    if (isTieNotEnoughPieces()) {
+        alert(tieMessage + ' Not enough pieces on board to win')
         return true
     }
+    if (NoCaptureOrRegPieceMovementCounter === 100) {
+        alert(tieMessage + ' 100 moves with no capture or regular piece movement')
+        return true
+    }
+    if (isTie3RepeatingBoards()) {
+        alert(tieMessage + ' The same board repeated itself for 3 times')
+        return true
+    }
+    return false
 }
-function hasGameWon(){
-    let pieces = isWhiteTurn? whitePieces:blackPieces
-    if(pieces.length === 0)
+function hasGameWon() {
+    let pieces = isWhiteTurn ? whitePieces : blackPieces
+    if (pieces.length === 0)
         return true
     for (const piece of pieces) {
-        if(isMovable(piece.boardLocation, isWhiteTurn))
+        if (isMovable(piece.boardLocation, isWhiteTurn))
             return false
     }
     return true
 }
-function isTie(){}
+function isTieNotEnoughPieces() {
 
+    if (whitePieces.length === 1 && blackPieces.length === 1)
+        if (whitePieces[0].isKing && blackPieces[0].isKing)
+            return true
+    return false
+}
+function isTie3RepeatingBoards() {
+    let counter = 1
+    for (let i = 0; i < savedBoardsAsStrings.length - 1; i++)
+        if (savedBoardsComparer(savedBoardsAsStrings[i], savedBoardsAsStrings[savedBoardsAsStrings.length - 1]))
+            counter++
+    return counter === 3
+}
+function savedBoardsComparer(savedBoard, currentBoard) {
+    if (currentBoard.length !== savedBoard.length)
+        return false
+    for (let i = 0; i < currentBoard.length; i++)
+        if (currentBoard[i] !== savedBoard[i])
+            return false
+    return true
+}
+function saveBoardState() {
+    let boardAsString = ''
+    for (let piece of whitePieces)
+        boardAsString += piece.boardLocation
+    for (let piece of blackPieces)
+        boardAsString += piece.boardLocation
+    savedBoardsAsStrings.push(boardAsString)
+}
+function clearTieAfterCaptureOrMove() {
+    NoCaptureOrRegPieceMovementCounter = 0
+    savedBoardsAsStrings = []
+}
 //html and css manipulation
 function addPieceToBoard(boardLocation, isWhite) {
     let visualPiece = document.createElement("div")
@@ -218,12 +260,13 @@ function executeMove(from, target, isWhite, captured = null) {
     if (captured !== null) {
         removeCapturedPieceFromPieceArray(captured, !isWhite)
         removePieceFromBoard(captured)
+        clearTieAfterCaptureOrMove()
     }
     findPiece(from, isWhite).boardLocation = target
     movePiece(from, target)
     mustCapture = true
     if (isCaptureMove(from, target) && checkForValidMoves(target, isWhite).length !== 0) {
-        cells[target].htmlRef.addEventListener('dblclick', chainCaptureCancel)
+        //cells[target].htmlRef.addEventListener('dblclick', chainCaptureCancel)
         cells[target].htmlRef.target = target
         showAvailableMoves(target)
         endTurn()
@@ -231,6 +274,9 @@ function executeMove(from, target, isWhite, captured = null) {
     }
     if (isPromotion(target, isWhite))
         promotion(target, isWhite)
+    //non-king movement to reset tie counters 
+    if (!findPiece(target, isWhite).isKing)
+        clearTieAfterCaptureOrMove()
     endTurn()
     newTurn()
 
@@ -277,7 +323,7 @@ function addClickEventListener(piece, isWhite) {
     })
 }
 function showAvailableMoves(boardLocation, isWhite) {
-    if (isWhite === isWhiteTurn) {
+    if (isWhite === isWhiteTurn && isGameActive) {
         removeAvailableMoves()
         let availableMove = document.createElement('div')
         availableMove.classList.add('circle')
