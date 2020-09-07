@@ -1,5 +1,7 @@
 let whitePieces = []
 let blackPieces = []
+let cellsArray = []
+let cellsHtmlRef = []
 let NoCaptureOrRegPieceMovementCounter = 0
 let savedBoardsAsStrings = []
 const turnIndicator = document.getElementsByClassName('turn-indicator-text')
@@ -23,7 +25,7 @@ newGameBtn.addEventListener('mouseleave', () => {
 ////instructions
 const instructionsBtn = document.getElementById('instructions-btn')
 instructionsBtn.addEventListener('click', () => {
-    document.getElementById('instructions').scrollIntoView(); 
+    document.getElementById('instructions').scrollIntoView();
 })
 instructionsBtn.addEventListener('mouseenter', () => {
     instructionsBtn.classList.add('hover');
@@ -32,24 +34,37 @@ instructionsBtn.addEventListener('mouseleave', () => {
     instructionsBtn.classList.remove('hover');
 })
 
-//game board cells(that are playable)
+//initialize board
 class Cell {
     constructor(boardLocation) {
         this.boardLocation = boardLocation
-        this.htmlRef = document.getElementById(boardLocation)
         this.isEmpty = true
     }
 }
-let cells = {
-    '00': new Cell('00'), '02': new Cell('02'), '04': new Cell('04'), '06': new Cell('06'), '11': new Cell('11'), '13': new Cell('13'),
-    '15': new Cell('15'), '17': new Cell('17'), '20': new Cell('20'), '22': new Cell('22'), '24': new Cell('24'), '26': new Cell('26'),
-    '31': new Cell('31'), '33': new Cell('33'), '35': new Cell('35'), '37': new Cell('37'), '40': new Cell('40'),
-    '42': new Cell('42'), '44': new Cell('44'), '46': new Cell('46'), '51': new Cell('51'), '53': new Cell('53'),
-    '55': new Cell('55'), '57': new Cell('57'), '60': new Cell('60'), '62': new Cell('62'), '64': new Cell('64'),
-    '66': new Cell('66'), '71': new Cell('71'), '73': new Cell('73'), '75': new Cell('75'), '77': new Cell('77'),
-    keys: ['00', '02', '04', '06', '11', '13', '15', '17', '20', '22', '24', '26', '31', '33', '35', '37', '40',
-        '42', '44', '46', '51', '53', '55', '57', '60', '62', '64', '66', '71', '73', '75', '77']
+
+let board = document.getElementById('board')
+
+for (let i = 0; i < 8; i++) {
+    for (let j = 0; j < 8; j++) {
+        if (j === 0) {
+            let col = document.createElement('div')
+            col.className = 'flex-container-column'
+            board.appendChild(col)
+        }
+        let cell = document.createElement('div')
+        cell.className = 'flex-squares'
+        if ((i % 2 === 0) !== (j % 2 === 0)) {
+            cell.id = (7 - j) + '' + i
+            cell.classList.add('black-cell')
+            cellsArray.push(new Cell(cell.id))
+            cellsHtmlRef.push(cell)
+        }
+        else
+            cell.classList.add('white-cell')
+        board.childNodes[i + 1].appendChild(cell)
+    }
 }
+
 //////
 class CheckersPiece {
     constructor(isWhite) {
@@ -70,10 +85,10 @@ class CheckersPiece {
         let vertical = verticalDirection * targetY - verticalDirection * fromY
         //regular move
         if (horizontal === 1 && vertical === 1)
-            return isCellEmpty(target)
+            return cellsArray[translateLocationToIndexInArray(target)].isEmpty
         //capture
         else if (horizontal === 2 && vertical === 2
-            && cells[target].isEmpty) {
+            && cellsArray[translateLocationToIndexInArray(target)].isEmpty) {
             let inBetweenCell = (targetX + fromX) / 2 + '' + (targetY + fromY) / 2
             return findPiece(inBetweenCell, !this.isWhite) !== null
         }
@@ -89,15 +104,15 @@ function initializePieces() {
     }
     let whiteCounter = 0
     let blackCounter = 0
-    for (let key of cells.keys)
-        if (key[0] < 3) {
-            whitePieces[whiteCounter].boardLocation = key
-            addPieceToBoard(key, true)
+    for (let cell of cellsArray)
+        if (cell.boardLocation[0] < 3) {
+            whitePieces[whiteCounter].boardLocation = cell.boardLocation
+            addPieceToBoard(cell.boardLocation, true)
             whiteCounter++
         }
-        else if (key[0] > 4) {
-            blackPieces[blackCounter].boardLocation = key
-            addPieceToBoard(key, false)
+        else if (cell.boardLocation[0] > 4) {
+            blackPieces[blackCounter].boardLocation = cell.boardLocation
+            addPieceToBoard(cell.boardLocation, false)
             blackCounter++
         }
 
@@ -139,14 +154,14 @@ function isMovable(boardLocation, isWhite) {
 }
 function checkForValidMoves(boardLocation, isWhite) {
     let ret = []
-    for (let cellLocation of cells.keys)
+    for (let cell of cellsArray)
         if (mustCapture) {
-            if (isValidMove(boardLocation, cellLocation, isWhite) && Math.abs(Number(boardLocation[0]) - Number(cellLocation[0])) === 2)
-                ret.push(cellLocation)
+            if (isValidMove(boardLocation, cell.boardLocation, isWhite) && Math.abs(Number(boardLocation[0]) - Number(cell.boardLocation[0])) === 2)
+                ret.push(cell.boardLocation)
         }
         else
-            if (isValidMove(boardLocation, cellLocation, isWhite))
-                ret.push(cellLocation)
+            if (isValidMove(boardLocation, cell.boardLocation, isWhite))
+                ret.push(cell.boardLocation)
     return ret
 }
 function isCaptureMove(boardLocation, target) {
@@ -221,6 +236,32 @@ function clearTieAfterCaptureOrMove() {
     NoCaptureOrRegPieceMovementCounter = 0
     savedBoardsAsStrings = []
 }
+function removeCapturedPieceFromPieceArray(captured, isWhite) {
+    let capturedPiece = findPiece(captured, isWhite)
+    let isWhitePiece = (capturedPiece !== null && isWhite)
+    let pieces = isWhitePiece ? whitePieces : blackPieces
+    for (let i = 0; i < pieces.length; i++) {
+        if (pieces[i].boardLocation === captured) {
+            pieces.splice(i, 1)
+            break;
+        }
+    }
+}
+function findPiece(boardLocation, isWhite) {
+    let pieces = isWhite ? whitePieces : blackPieces
+    for (let piece of pieces) {
+        if (piece.boardLocation === boardLocation)
+            return piece
+    }
+    return null
+}
+function translateLocationToIndexInArray(boardLocation) {
+    for (let i = 0; i < cellsArray.length; i++) {
+        if (boardLocation === cellsArray[i].boardLocation)
+            return i
+    }
+}
+
 //html and css manipulation
 function addPieceToBoard(boardLocation, isWhite) {
     let visualPiece = document.createElement("div")
@@ -229,22 +270,25 @@ function addPieceToBoard(boardLocation, isWhite) {
         visualPiece.classList.add("black-piece")
     else
         visualPiece.classList.add("white-piece")
-    cells[boardLocation].isEmpty = false
-    cells[boardLocation].htmlRef.appendChild(visualPiece)
+    let index = translateLocationToIndexInArray(boardLocation)
+    cellsArray[index].isEmpty = false
+    cellsHtmlRef[index].appendChild(visualPiece)
 
 }
 function removePieceFromBoard(boardLocation) {
-    cells[boardLocation].isEmpty = true
-    while (cells[boardLocation].htmlRef.hasChildNodes())
-        cells[boardLocation].htmlRef.removeChild(cells[boardLocation].htmlRef.children[0])
+    let index = translateLocationToIndexInArray(boardLocation)
+    cellsArray[index].isEmpty = true
+    while (cellsHtmlRef[index].hasChildNodes())
+        cellsHtmlRef[index].removeChild(cellsHtmlRef[index].children[0])
 }
 function movePiece(boardLocation, target) {
-    cells[boardLocation].isEmpty = true
-    cells[target].isEmpty = false
-    while (cells[target].htmlRef.hasChildNodes())
-        cells[target].htmlRef.removeChild(cells[target].htmlRef.childNodes[0])
-
-    cells[target].htmlRef.appendChild(cells[boardLocation].htmlRef.childNodes[0])
+    let fromIndex = translateLocationToIndexInArray(boardLocation)
+    let targetIndex = translateLocationToIndexInArray(target)
+    cellsArray[fromIndex].isEmpty = true
+    cellsArray[targetIndex].isEmpty = false
+    while (cellsHtmlRef[targetIndex].hasChildNodes())
+        cellsHtmlRef[targetIndex].removeChild(cellsHtmlRef[targetIndex].childNodes[0])
+    cellsHtmlRef[targetIndex].appendChild(cellsHtmlRef[fromIndex].childNodes[0])
     removeAvailableMoves()
 }
 function promotion(boardLocation, isWhite) {
@@ -252,7 +296,7 @@ function promotion(boardLocation, isWhite) {
     if (!piece.isKing) {
         let king = document.createElement("img")
         king.setAttribute('src', 'crown.png')
-        cells[boardLocation].htmlRef.children[0].appendChild(king)
+        cellsHtmlRef[translateLocationToIndexInArray(boardLocation)].children[0].appendChild(king)
         piece.isKing = true;
     }
 }
@@ -266,8 +310,6 @@ function executeMove(from, target, isWhite, captured = null) {
     movePiece(from, target)
     mustCapture = true
     if (isCaptureMove(from, target) && checkForValidMoves(target, isWhite).length !== 0) {
-        //cells[target].htmlRef.addEventListener('dblclick', chainCaptureCancel)
-        cells[target].htmlRef.target = target
         showAvailableMoves(target)
         endTurn()
         newTurn()
@@ -279,24 +321,6 @@ function executeMove(from, target, isWhite, captured = null) {
         clearTieAfterCaptureOrMove()
     endTurn()
     newTurn()
-
-}
-function chainCaptureCancel(event) {
-    removeAvailableMoves()
-    endTurn()
-    newTurn()
-    cells[Number(event.currentTarget.target)].htmlRef.removeEventListener('dblclick', chainCaptureCancel)
-}
-function removeCapturedPieceFromPieceArray(captured, isWhite) {
-    let capturedPiece = findPiece(captured, isWhite)
-    let isWhitePiece = (capturedPiece !== null && isWhite)
-    let pieces = isWhitePiece ? whitePieces : blackPieces
-    for (let i = 0; i < pieces.length; i++) {
-        if (pieces[i].boardLocation === captured) {
-            pieces.splice(i, 1)
-            break;
-        }
-    }
 }
 function turnIndicatorlightAndAvailableToMoveIndicator() {
     let turn = isWhiteTurn ? 1 : 0
@@ -306,7 +330,7 @@ function turnIndicatorlightAndAvailableToMoveIndicator() {
     for (let piece of pieces) {
         let boardLocation = piece.boardLocation
         if (checkForValidMoves(boardLocation, isWhiteTurn).length !== 0)
-            cells[boardLocation].htmlRef.childNodes[0].classList.add('available-to-move')
+            cellsHtmlRef[translateLocationToIndexInArray(boardLocation)].childNodes[0].classList.add('available-to-move')
     }
 }
 function addEventListenersForPieces() {
@@ -328,11 +352,10 @@ function showAvailableMoves(boardLocation, isWhite) {
         let availableMove = document.createElement('div')
         availableMove.classList.add('circle')
         availableMove.classList.add('available-move')
-
         if (isMovable(boardLocation, isWhite)) {
             let availableCells = checkForValidMoves(boardLocation, isWhite)
             for (let cellLocation of availableCells) {
-                cells[cellLocation].htmlRef.appendChild(availableMove.cloneNode()).addEventListener('click', () => {
+                cellsHtmlRef[translateLocationToIndexInArray(cellLocation)].appendChild(availableMove.cloneNode()).addEventListener('click', () => {
                     let captured = null
                     if (isCaptureMove(boardLocation, cellLocation)) {
                         let x = Math.abs(Number(boardLocation[0]) + Number(cellLocation[0])) / 2
@@ -346,36 +369,21 @@ function showAvailableMoves(boardLocation, isWhite) {
     }
 }
 function removeAvailableMoves() {
-    for (let cellLocation of cells.keys) {
-        let cell = cells[cellLocation]
-        if (cell.isEmpty && cell.htmlRef.hasChildNodes())
-            cells[cellLocation].htmlRef.removeChild(cell.htmlRef.children[0])
+    for (let i = 0; i < cellsArray.length; i++) {
+        if (cellsArray[i].isEmpty && cellsHtmlRef[i].hasChildNodes())
+            cellsHtmlRef[i].removeChild(cellsHtmlRef[i].children[0])
     }
 }
-
 //auxilary functions
-function findPiece(boardLocation, isWhite) {
-    let pieces = isWhite ? whitePieces : blackPieces
-    for (let piece of pieces) {
-        if (piece.boardLocation === boardLocation)
-            return piece
-    }
-    return null
-}
-function isCellEmpty(boardLocation) {
-    return cells[boardLocation].isEmpty
-}
+
 function endTurn() {
     let pieces = isWhiteTurn ? whitePieces : blackPieces
     for (let piece of pieces) {
-        cells[piece.boardLocation].htmlRef.childNodes[0].classList.remove('available-to-move')
+        let index = translateLocationToIndexInArray(piece.boardLocation)
+        cellsHtmlRef[index].childNodes[0].classList.remove('available-to-move')
     }
     didTurnOccur = true
     isWhiteTurn = !isWhiteTurn
 }
-function applyMustCapture() {
-    mustCapture = true
-}
-
 ////////start the game////////
 gameStart()

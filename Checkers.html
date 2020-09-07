@@ -16,87 +16,7 @@
     <div class="flex-container">
         <div>
             <h2 class="turn-indicator-text">Player 2</h2>
-            <div class="flex-container-board">
-                <div class="flex-container-column">
-                    <div class="flex-squares white-cell"></div>
-                    <div id="60" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="40" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="20" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="00" class="flex-squares black-cell"></div>
-                </div>
-                <div class="flex-container-column">
-                    <div id="71" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="51" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="31" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="11" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                </div>
-                <div class="flex-container-column">
-                    <div class="flex-squares white-cell"></div>
-                    <div id="62" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="42" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="22" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="02" class="flex-squares black-cell"></div>
-                </div>
-                <div class="flex-container-column">
-                    <div id="73" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="53" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="33" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="13" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                </div>
-                <div class="flex-container-column">
-                    <div class="flex-squares white-cell"></div>
-                    <div id="64" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="44" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="24" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="04" class="flex-squares black-cell"></div>
-                </div>
-                <div class="flex-container-column">
-                    <div id="75" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="55" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="35" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="15" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                </div>
-                <div class="flex-container-column">
-                    <div class="flex-squares white-cell"></div>
-                    <div id="66" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="46" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="26" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="06" class="flex-squares black-cell"></div>
-                </div>
-                <div class="flex-container-column">
-                    <div id="77" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="57" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="37" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                    <div id="17" class="flex-squares black-cell"></div>
-                    <div class="flex-squares white-cell"></div>
-                </div>
+            <div id="board" class="flex-container-board">
             </div>
             <h2 class="turn-indicator-text">Player 1</h2>
         </div>
@@ -104,21 +24,28 @@
     <div class="instructions-container">
         <div id="instructions">
             <h1>HOW TO PLAY</h1><br>
-            Pieces can only move diagonally on the dark squares, the light squares of the board are never used. A normal
-            move is moving a piece diagonally forward one square. The initial pieces can only move forward diagonally,
+            Pieces can only move diagonally on the dark squares, the light squares of the board are never used. A
+            normal
+            move is moving a piece diagonally forward one square. The initial pieces can only move forward
+            diagonally,
             not backwards. You cannot move onto a square that is occupied by another piece. However, if an opponent
-            piece is on the square diagonally in front of you and the square behind it is empty then you can (and must!)
+            piece is on the square diagonally in front of you and the square behind it is empty then you can (and
+            must!)
             jump over it diagonally, thereby capturing it. If you land on a square where you can capture another
-            opponent piece you must jump over that piece as well, immediately. One turn can capture many pieces. It is
+            opponent piece you must jump over that piece as well, immediately. One turn can capture many pieces. It
+            is
             required to jump over pieces whenever you can.
 
             If a piece reaches the end row of the board, on the opponent's side, it becomes a King. Kings can move
-            diagonally forwards and backwards, making them more powerful in jumping over opponent pieces. However, if
-            you jump over a piece to become a King you can not jump backwards over another piece in the same move, you
+            diagonally forwards and backwards, making them more powerful in jumping over opponent pieces. However,
+            if
+            you jump over a piece to become a King you can not jump backwards over another piece in the same move,
+            you
             have to wait until the next turn to start moving backwards.
 
             Jumping over opponents is required. However, if you have two possible moves, where one jumps over one
-            opponent and the other jumps over two or more opponents you are not required to take the jump with the most
+            opponent and the other jumps over two or more opponents you are not required to take the jump with the
+            most
             opponents captured, you are just required to take any jump move.
             <br><br>
             <h1>WINNING</h1><br>
@@ -126,7 +53,8 @@
 
             1. If a player has lost all his pieces he loses.<br>
             2. If a player can't move at all, all his pieces are blocked, he loses.<br>
-            3. The exact same board state has come up three times without any men captured in between. The game ends in
+            3. The exact same board state has come up three times without any men captured in between. The game ends
+            in
             a draw. <br>
             4. There have been 100 moves (50 for each player) with no piece captured. The game ends in a draw
         </div>
