@@ -79,7 +79,7 @@ h2{
 }
 
 .available-to-move{
-    border: 4px solid lightblue;
+    border: 2px solid lightblue;
 }
 
 .turn-indicator{
@@ -184,5 +184,8 @@ img{
     h1{
         margin: 0;
         text-decoration-line: underline;
+    }
+    .available-to-move{
+        border: 4px solid lightblue;
     }
     }
