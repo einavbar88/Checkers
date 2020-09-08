@@ -9,7 +9,7 @@ let didTurnOccur = false
 let isWhiteTurn = true
 let mustCapture = true
 let isGameActive = true
-
+/////////////////////////////////////////////////////
 /////buttons//////
 ////new game
 const newGameBtn = document.getElementById('new-game-btn')
@@ -33,8 +33,8 @@ instructionsBtn.addEventListener('mouseenter', () => {
 instructionsBtn.addEventListener('mouseleave', () => {
     instructionsBtn.classList.remove('hover');
 })
-
-//initialize board
+///////////////////////////////////////////////////////////////////
+////initialize board////
 class Cell {
     constructor(boardLocation) {
         this.boardLocation = boardLocation
@@ -65,7 +65,7 @@ for (let i = 0; i < 8; i++) {
     }
 }
 
-//////
+///////////////////////////////////////////
 class CheckersPiece {
     constructor(isWhite) {
         this.isWhite = isWhite
@@ -96,7 +96,7 @@ class CheckersPiece {
             return false
     }
 }
-//initialization and turn start
+//game initialization and turn start
 function initializePieces() {
     for (let i = 0; i < 12; i++) {
         whitePieces.push(new CheckersPiece(true))
@@ -134,7 +134,18 @@ function newTurn() {
     while (didTurnOccur && isGameActive)
         return newTurn()
 }
-//logic functions
+
+function endTurn() {
+    let pieces = isWhiteTurn ? whitePieces : blackPieces
+    for (let piece of pieces) {
+        let index = translateLocationToIndexInArray(piece.boardLocation)
+        cellsHtmlRef[index].childNodes[0].classList.remove('available-to-move')
+    }
+    didTurnOccur = true
+    isWhiteTurn = !isWhiteTurn
+}
+//////////////////////////////////////////
+///////logic functions/////////
 function isValidMove(boardLocation, target, isWhiteTurn) {
     let piece = findPiece(boardLocation, isWhiteTurn)
     if (piece === null)
@@ -168,8 +179,14 @@ function isCaptureMove(boardLocation, target) {
     return Math.abs(Number(boardLocation[0]) - Number(target[0])) === 2
 }
 function isPromotion(boardLocation, isWhite) {
+    let piece = findPiece(boardLocation, isWhite)
     let promotionRow = isWhite ? 7 : 0
-    return boardLocation[0] === '' + promotionRow
+    if(boardLocation[0] === '' + promotionRow && !piece.isKing){
+        piece.isKing = true;
+        clearTieAfterCaptureOrMove()
+        return true
+    }
+    return false
 }
 function hasGameEnded() {
     let tieMessage = 'Game ended in a tie!'
@@ -261,8 +278,22 @@ function translateLocationToIndexInArray(boardLocation) {
             return i
     }
 }
-
-//html and css manipulation
+function executeMove(from, target, isWhite, captured = null) {
+    if (captured !== null) {
+        removeCapturedPieceFromPieceArray(captured, !isWhite)
+        clearTieAfterCaptureOrMove()
+    }
+    findPiece(from, isWhite).boardLocation = target
+    movePiece(from, target)
+}
+function movePiece(boardLocation, target){
+    let fromIndex = translateLocationToIndexInArray(boardLocation)
+    let targetIndex = translateLocationToIndexInArray(target)
+    cellsArray[fromIndex].isEmpty = true
+    cellsArray[targetIndex].isEmpty = false
+}
+///////////////////////////////////////
+////html and css manipulation/////
 function addPieceToBoard(boardLocation, isWhite) {
     let visualPiece = document.createElement("div")
     visualPiece.classList.add("circle")
@@ -281,33 +312,23 @@ function removePieceFromBoard(boardLocation) {
     while (cellsHtmlRef[index].hasChildNodes())
         cellsHtmlRef[index].removeChild(cellsHtmlRef[index].children[0])
 }
-function movePiece(boardLocation, target) {
+function UIMovePiece(boardLocation, target) {
     let fromIndex = translateLocationToIndexInArray(boardLocation)
     let targetIndex = translateLocationToIndexInArray(target)
-    cellsArray[fromIndex].isEmpty = true
-    cellsArray[targetIndex].isEmpty = false
     while (cellsHtmlRef[targetIndex].hasChildNodes())
         cellsHtmlRef[targetIndex].removeChild(cellsHtmlRef[targetIndex].childNodes[0])
     cellsHtmlRef[targetIndex].appendChild(cellsHtmlRef[fromIndex].childNodes[0])
     removeAvailableMoves()
 }
-function promotion(boardLocation, isWhite) {
-    let piece = findPiece(boardLocation, isWhite)
-    if (!piece.isKing) {
+function promotion(boardLocation) {
         let king = document.createElement("img")
         king.setAttribute('src', 'crown.png')
         cellsHtmlRef[translateLocationToIndexInArray(boardLocation)].children[0].appendChild(king)
-        piece.isKing = true;
-    }
 }
-function executeMove(from, target, isWhite, captured = null) {
-    if (captured !== null) {
-        removeCapturedPieceFromPieceArray(captured, !isWhite)
+function UIExecuteMove(from, target, isWhite, captured = null) {
+    if (captured !== null)
         removePieceFromBoard(captured)
-        clearTieAfterCaptureOrMove()
-    }
-    findPiece(from, isWhite).boardLocation = target
-    movePiece(from, target)
+    UIMovePiece(from, findPiece(target, isWhite).boardLocation)
     mustCapture = true
     if (isCaptureMove(from, target) && checkForValidMoves(target, isWhite).length !== 0) {
         showAvailableMoves(target)
@@ -315,10 +336,8 @@ function executeMove(from, target, isWhite, captured = null) {
         newTurn()
     }
     if (isPromotion(target, isWhite))
-        promotion(target, isWhite)
-    //non-king movement to reset tie counters 
-    if (!findPiece(target, isWhite).isKing)
-        clearTieAfterCaptureOrMove()
+        promotion(target)
+    /////non-king movement to reset tie counters ////
     endTurn()
     newTurn()
 }
@@ -363,6 +382,7 @@ function showAvailableMoves(boardLocation, isWhite) {
                         captured = x + '' + y
                     }
                     executeMove(boardLocation, cellLocation, isWhite, captured)
+                    UIExecuteMove(boardLocation, cellLocation, isWhite, captured)
                 })
             }
         }
@@ -373,17 +393,6 @@ function removeAvailableMoves() {
         if (cellsArray[i].isEmpty && cellsHtmlRef[i].hasChildNodes())
             cellsHtmlRef[i].removeChild(cellsHtmlRef[i].children[0])
     }
-}
-//auxilary functions
-
-function endTurn() {
-    let pieces = isWhiteTurn ? whitePieces : blackPieces
-    for (let piece of pieces) {
-        let index = translateLocationToIndexInArray(piece.boardLocation)
-        cellsHtmlRef[index].childNodes[0].classList.remove('available-to-move')
-    }
-    didTurnOccur = true
-    isWhiteTurn = !isWhiteTurn
 }
 ////////start the game////////
 gameStart()
