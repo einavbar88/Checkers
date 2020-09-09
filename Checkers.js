@@ -331,9 +331,7 @@ function UIExecuteMove(from, target, isWhite, captured = null) {
     UIMovePiece(from, findPiece(target, isWhite).boardLocation)
     mustCapture = true
     if (isCaptureMove(from, target) && checkForValidMoves(target, isWhite).length !== 0) {
-        showAvailableMoves(target)
-        endTurn()
-        newTurn()
+        return showAvailableMoves(target)
     }
     if (isPromotion(target, isWhite))
         promotion(target)
