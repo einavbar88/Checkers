@@ -11,6 +11,11 @@ let mustCapture = true
 let isGameActive = true
 /////////////////////////////////////////////////////
 /////buttons//////
+////home button
+const homeBtn = document.getElementById('home-btn')
+homeBtn.addEventListener('click', () => { window.location.href = 'https://einav15.github.io/MainPage/main.html'; })
+homeBtn.addEventListener('mouseenter', () => { homeBtn.classList.add('hover') })
+homeBtn.addEventListener('mouseleave', () => { homeBtn.classList.remove('hover'); })
 ////new game
 const newGameBtn = document.getElementById('new-game-btn')
 newGameBtn.addEventListener('click', () => {
